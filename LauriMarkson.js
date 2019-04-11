@@ -22,7 +22,9 @@ const lauriResponses = [
 	"Please try to enunciate and speak clearly; I want to be able to hear your voice.",
 	"Very good!",
 	"Shame on you!",
-	"Pardon me."
+	"Pardon me.",
+	"I shouldn't have to tell you to enunciate...",
+	"I'm an elitist, and I'm an erudite, and I'm not apologizing."
 ];
 
 LauriMarkson.login("you wish");
@@ -115,6 +117,6 @@ LauriMarkson.on("message", async msg => {
 	}
 
 	msg.channel.send(responseStr)
-		.then(s => s.delete(5000))
+		.then(s => s.delete(15000))
 		.catch(e => { });
 });
