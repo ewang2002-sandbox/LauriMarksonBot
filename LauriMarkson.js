@@ -19,7 +19,7 @@ const lauriResponses = [
 	"Write this down, write this down!"
 ];
 
-LauriMarkson.login("NTYzNTQ5NDE1NzA1NDExNTg0.XWNKqQ.wZIiO_sQCYuWhK9hb3lKy1XnL9M");
+LauriMarkson.login("");
 
 LauriMarkson.on("ready", () => {
 	console.log(`No no no no no! Lauri Markson, the true lady, is officially online.`);
