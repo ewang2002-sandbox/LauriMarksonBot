@@ -1,7 +1,5 @@
 const Discord = require("discord.js");
 const LauriMarkson = new Discord.Client();
-const stats = require("./stats.json");
-const fs = require("fs");
 
 const writeGood = require("write-good");
 const spellchecker = require("spellchecker");
@@ -19,70 +17,24 @@ const lauriResponses = [
 	"Write this down, write this down!"
 ];
 
-LauriMarkson.login("");
+const membersToCorrect = [
+	"422560967293927424"
+];
+
+LauriMarkson.login("NTYzNTQ5NDE1NzA1NDExNTg0.XKa8Sg.ZpIyv1uffE-V8wu2FxV1HizhWfo");
 
 LauriMarkson.on("ready", () => {
 	console.log(`No no no no no! Lauri Markson, the true lady, is officially online.`);
 });
 
 LauriMarkson.on("message", msg => {
-	if (msg.author.bot || !msg.guild) {
+	if (msg.author.bot || !msg.guild || !membersToCorrect.includes(msg.author.id)) {
 		return;
 	}
 
 	if (msg.type === "PINS_ADD") {
 		msg.channel.send("Why aren't you writing this down? Write this down, write this down!")
-			.then(x => x.delete(5000));
-		return;
-	}
-
-	if (msg.content.toLowerCase().includes("lauri, who are your least favorite students") || msg.content.startsWith(">score")) {
-		msg.delete().catch(e => { });
-		let arr = [];
-		for (let id in stats) {
-			arr.push([id, stats[id]["pts"]]);
-		}
-
-		if (arr.length === 0) {
-			msg.channel.send("No one has been penalized yet.")
-				.then(x => x.delete(5000));
-			return;
-		}
-
-		arr.sort((a, b) => {
-			let avalue = a[1],
-				bvalue = b[1];
-			if (avalue > bvalue) {
-				return -1;
-			}
-			if (avalue < bvalue) {
-				return 1;
-			}
-			return 0;
-		});
-
-		let length;
-		if (arr.length < 15) {
-			length = arr.length;
-		} else {
-			length = 15;
-		}
-
-		let str = "";
-		for (let i = 0; i < length; i++) {
-			str += `**[${i + 1}]** <@!${arr[i][0]}> (${arr[i][1]} Points)\n`;
-		}
-
-		const f = new Discord.RichEmbed()
-			.setAuthor("Lauri Markson", "https://cdn.discordapp.com/attachments/520019296936525834/520019481096093697/lauri.png")
-			.setTitle("❌ My Least Favorite Students ❌")
-			.setDescription(str)
-			.setColor("RED");
-		if (msg.content.toLowerCase().includes("lauri, who are your least favorite students")) {
-			msg.channel.send(`Well, ${msg.author}...`, f);
-			return;
-		}
-		msg.channel.send(f);
+			.then(x => x.delete({ timeout: 5000 }));
 		return;
 	}
 
@@ -95,7 +47,7 @@ LauriMarkson.on("message", msg => {
 
 	if (respond.size >= 5) {
 		msg.channel.send(lauriResponses[Math.floor(Math.random() * lauriResponses.length)])
-			.then(x => x.delete(5000));
+			.then(x => x.delete({ timeout: 5000 }));
 		respond.clear();
 		return;
 	}
@@ -111,11 +63,10 @@ LauriMarkson.on("message", msg => {
 	if (isFound) {
 		talked[msg.author.id]["amt"] += 1;
 		if (talked[msg.author.id]["amt"] === 6) {
-			msg.channel.send(new Discord.RichEmbed()
+			msg.channel.send(new Discord.MessageEmbed()
 				.setColor("RED")
 				.setDescription("When I talk, you write. -2")
-			).then(x => x.delete(5000));
-			updateScore(msg, -2, 0);
+			).then(x => x.delete({ timeout: 5000 }));
 		}
 		return;
 	}
@@ -185,7 +136,7 @@ LauriMarkson.on("message", msg => {
 		return;
 	}
 
-	const embed = new Discord.RichEmbed()
+	const embed = new Discord.MessageEmbed()
 		.setAuthor("Lauri Markson", "https://cdn.discordapp.com/attachments/520019296936525834/520019481096093697/lauri.png")
 		.setTitle("No no no no no!")
 		.setDescription(responseStr)
@@ -193,10 +144,8 @@ LauriMarkson.on("message", msg => {
 		.setColor(0xfc0303);
 
 	msg.channel.send(embed)
-		.then(s => s.delete(5000))
+		.then(s => s.delete({ timeout: 5000 }))
 		.catch(e => { });
-
-	updateScore(msg, penalty);
 
 	talked[msg.author.id] = {
 		"amt": 1
@@ -206,26 +155,3 @@ LauriMarkson.on("message", msg => {
 		delete talked[msg.author.id];
 	}, 15000);
 });
-
-/**
- * @param {Discord.Message} msg 
- * @param {number} penalty 
- */
-function updateScore(msg, penalty) {
-	let userFound = false;
-	for (let id in stats) {
-		if (id === msg.author.id) {
-			userFound = true;
-			break;
-		}
-	}
-
-	if (userFound) {
-		stats[msg.author.id]["pts"] = parseInt(stats[msg.author.id]["pts"]) + penalty;
-	} else {
-		stats[msg.author.id] = {
-			"pts": Math.abs(penalty)
-		};
-	}
-	fs.writeFile("./stats.json", JSON.stringify(stats), (err) => console.error);
-}

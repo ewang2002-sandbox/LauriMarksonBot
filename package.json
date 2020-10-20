@@ -4,9 +4,9 @@
   "description": "Three Discord bots in one.",
   "main": "threeInOne.js",
   "dependencies": {
-    "discord.js": "^11.4.2",
-    "spellchecker": "^3.5.2",
-    "write-good": "^1.0.1"
+    "discord.js": "12.3.1",
+    "spellchecker": "3.7.0",
+    "write-good": "^1.0.3"
   },
   "devDependencies": {},
   "scripts": {
